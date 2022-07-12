@@ -18,3 +18,9 @@ find_all_datasources = func() {
   return datasources
 }
 
+
+validate_condition = 0 
+
+main = rule {
+    validate_condition <= 0 
+}
