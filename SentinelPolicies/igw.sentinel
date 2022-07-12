@@ -5,21 +5,19 @@ import "tfstate/v2" as tfstate
 param aws_account_id default  [955766821354, 3064333]
 current_aws_id=tfstate.outputs.account_id.value
 print("current_aws_id ",current_aws_id)
-
+print("aws_account_id ",aws_account_id)
 
 # Get all aws_s3_bucket_acl
 igw = plan.find_resources("aws_internet_gateway") 
-print("igw ",igw)
-print("length igw ",length(igw))
-print("length",length(igw["messages"]))
+ 
+print("length igw ",length(igw)) 
 print("account check",current_aws_id in aws_account_id)
 
-print("violations  ",length(igw["messages"]) > 0 and current_aws_id in aws_account_id)
+print("violations  ",length(igw) > 0 and (current_aws_id in aws_account_id))
 # Count violations
 violations=0
 # violations = length(igw["messages"]) is 0 and current_aws_id in aws_account_id
  
-
 main = rule {
     violations <= 0 
 }
