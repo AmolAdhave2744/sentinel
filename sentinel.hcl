@@ -2,7 +2,7 @@ module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
 
-policy "tgw_check.sentinel" {
+policy "igw" {
    enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/tgw_check.sentinel"
+   source = "./SentinelPolicies/igw.sentinel"
 }
