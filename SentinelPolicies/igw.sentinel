@@ -1,8 +1,11 @@
 import "tfplan/v2" as tfplan
 import "tfconfig/v2" as tfconfig
+import "tfstate/v2" as tfstate
 
  
-print("find_datasources_in_module ", tfconfig.outputs)
+print("tfconfig ", tfconfig.outputs)
+print("tfplan ", tfplan.outputs)
+print("tfstate ", tfstate.outputs)
 
 datasources = filter tfconfig.resources as address, d {
 d.mode is "data"
