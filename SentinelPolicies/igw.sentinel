@@ -3,22 +3,24 @@ import "tfconfig/v2" as tfconfig
 import "tfstate/v2" as tfstate
 
  
-print("tfconfig ", tfconfig.outputs)
-print("tfplan ", tfplan.outputs)
-print("tfstate ", tfstate.outputs)
-print("tfstate ", tfstate.outputs.account_id)
-print("tfstate ", tfstate.outputs.account_id.value)
+param aws_account_id default  [955766821354, 3064333]
+current_aws_id=tfstate.outputs.account_id.value
+print("current_aws_id ",current_aws_id)
 
-datasources = filter tfconfig.resources as address, d {
-d.mode is "data"
-}
-print("find_all_datasources ",datasources)
+
+# Get all aws_s3_bucket_acl
+igw = plan.find_resources("aws_internet_gateway") 
+print("igw ",igw)
+print("length igw ",length(igw))
+print("length",length(igw["messages"]))
+print("account check",current_aws_id in aws_account_id)
+
+print("violations  ",length(igw["messages"]) > 0 and current_aws_id in aws_account_id)
+# Count violations
+violations=0
+# violations = length(igw["messages"]) is 0 and current_aws_id in aws_account_id
  
 
-
-
-validate_condition = 0 
-
 main = rule {
-    validate_condition <= 0 
+    violations <= 0 
 }
