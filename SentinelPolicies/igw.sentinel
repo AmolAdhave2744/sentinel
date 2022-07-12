@@ -4,6 +4,9 @@
 import "tfplan/v2" as tfplan
 import "tfconfig/v2" as tfconfig
 
+
+print("tfconfig ",tfconfig)
+print("tfplan ",tfplan)
 find_all_outputs = func() {
     
   print("find_datasources_in_module ", tfconfig.outputs)
