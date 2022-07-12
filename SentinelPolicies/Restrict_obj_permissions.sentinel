@@ -1,0 +1,20 @@
+import "tfplan-functions" as plan
+
+# Get all aws_s3_bucket_acl
+s3_bucket_aclList = plan.find_resources("aws_s3_bucket_acl") 
+
+violatings3Acl = 0
+acl=["private"]
+
+for s3_bucket_aclList as s3AclName, Obj {  
+    if Obj.change.after.acl else null is null or 
+       Obj.change.after.acl not in acl { 
+        violatings3Acl +=1       
+        print("Violation: S3 Bucket should not be public by default. Error for S3 Object - ",s3AclName )
+    }
+}
+
+
+main = rule {
+    violatings3Acl <= 0 #and violating_iam_user <=0
+}

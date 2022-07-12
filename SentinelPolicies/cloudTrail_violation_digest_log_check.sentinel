@@ -1,0 +1,23 @@
+###########################################################
+#Rule: Check CloudTrail configuration
+###########################################################
+#Checks whether AWS CloudTrail creates a signed digest file with logs.
+###########################################################
+import "tfplan-functions" as plan
+
+# Get all CloudTrail
+allCloudTrail = plan.find_resources("aws_cloudtrail") 
+violatingCloudTrail = 0
+
+for allCloudTrail as cloudTrailName, Obj {  
+    
+    if Obj.change.after.enable_log_file_validation is false {
+        violatingCloudTrail +=1       
+        print("Violation: CloudTrail digest Log files Vlaidation not configured for - ",cloudTrailName )
+    } 
+
+}
+
+main = rule {
+    violatingCloudTrail <= 0
+}

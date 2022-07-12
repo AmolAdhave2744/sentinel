@@ -1,0 +1,19 @@
+import "tfplan/v2" as tfplan
+alleks = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_eks_cluster" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+validate_condition = 0
+for alleks as _, eks {
+    if eks["change"]["after"]["vpc_config"][0]["endpoint_private_access"] is false {
+        validate_condition = validate_condition + 1
+        print("EKS cluster should be Private", eks["address"])
+    }
+    print(eks["change"]["after"]["vpc_config"][0]["endpoint_private_access"])
+}
+
+main = rule {
+    validate_condition <= 0
+}

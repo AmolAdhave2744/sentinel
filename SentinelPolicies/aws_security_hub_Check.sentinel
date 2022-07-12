@@ -1,0 +1,27 @@
+###########################################################
+#Rule: Check AWS Security Hub Standard
+###########################################################
+#AWS Security Hub 
+#a. CIS AWS Foundations
+#b. AWS Foundation Security Best Practices
+###########################################################
+import "tfplan-functions" as plan
+
+param aws_standard default []
+
+# Get all SecuirtyHub Resource
+awsSecurityHubList = plan.find_resources("aws_securityhub_standards_subscription")
+
+violatingSecurityhub = 0 
+
+for awsSecurityHubList as awsSecurityHubName, Obj {
+    if Obj.change.after.standards_arn else null is null or 
+    ( Obj.change.after.standards_arn not in aws_standard ) {
+        violatingSecurityhub +=1
+        print("Error: Aws Securityhub Standards Violation - ",awsSecurityHubName )
+    }  
+}
+
+main = rule {
+    violatingSecurityhub is 0
+}

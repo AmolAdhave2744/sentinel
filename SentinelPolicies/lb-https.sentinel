@@ -1,0 +1,47 @@
+###########################################################
+#Rule: Ensure HTTPS enabled on ALB/NLB
+###########################################################
+# All data-in-transit shall be protected using Authority-approved 
+# cryptographic control and enforce only strong algorithm.
+###########################################################
+import "tfplan/v2" as tfplan
+import "tfconfig/v2" as tfconfig
+alllistenerrule = filter tfconfig.resources as _, rc {
+    rc.type is "aws_lb_listener"
+}
+allllb = filter tfconfig.resources as _, rc {
+    rc.type is "aws_lb"
+}
+# allhttpenabled = []
+allhttpsenabled443 = []
+externallb = []
+for alllistenerrule as _, lrule{
+    if lrule["config"]["port"]["constant_value"] is "443" {
+        append(allhttpsenabled443, lrule["config"]["load_balancer_arn"]["references"][1])
+    }
+    
+    # print(lrule["config"]["protocol"]["constant_value"])
+    # if lrule["config"]["protocol"]["constant_value"] is "HTTPS" {
+    #     append(allhttpsenabled, lrule["config"]["load_balancer_arn"]["references"][1])
+    # }
+    # if lrule["config"]["protocol"]["constant_value"] is "HTTP" {
+    #     append(allhttpenabled, lrule["config"]["load_balancer_arn"]["references"][1])
+    # }
+}
+validate_condition = 0
+for allllb as _, lb {
+    if lb["config"]["internal"]["constant_value"] is false {
+        append(externallb, lb["address"])
+    }
+}
+
+for externallb as _, lb {
+    if lb not in allhttpsenabled443 {
+        print("Violation: HTTPS/Port 443 not enabled on", lb)
+        validate_condition = validate_condition + 1
+    }
+}
+
+main = rule {
+    validate_condition <= 0 
+}

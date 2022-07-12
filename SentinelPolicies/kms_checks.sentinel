@@ -1,0 +1,28 @@
+###########################################################
+#Rule: Check KMS parameters
+###########################################################
+# All data-at-rest shall be protected using Authority-approved cryptographic controls 
+# and enforce only strong algorithm.
+###########################################################
+import "tfplan/v2" as tfplan
+param Kms_allowspec default []
+# Kms_allowspec = ["SYMMETRIC_DEFAULT"]
+allkeys = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_kms_key" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+
+validate_condition = 0
+for allkeys as _, key{
+    print("current key spec is ", key["change"]["after"]["customer_master_key_spec"])
+    if key["change"]["after"]["customer_master_key_spec"] not in Kms_allowspec{
+        validate_condition = validate_condition + 1
+        print("Violation: KMS", key["address"] ,"key not following the allowed Specifications")
+    }
+}
+
+main = rule {
+    validate_condition <= 0 
+}

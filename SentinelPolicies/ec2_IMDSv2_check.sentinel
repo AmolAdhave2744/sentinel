@@ -1,0 +1,36 @@
+###########################################################
+#Rule: Check Ec2 Instance configured IMDSv2
+###########################################################
+#Checks whether your Amazon Elastic Compute Cloud (Amazon EC2) instance
+#metadata version is configured with Instance Metadata Service Version 2 (IMDSv2).
+###########################################################
+import "tfplan-functions" as plan
+
+iMDSv2_http_token=["required"]
+# Get all Ec2
+allEc2s = plan.find_resources("aws_instance")  
+violatingEc2Imdsv2 = 0
+
+for allEc2s as ec2Obj, meta { 
+
+    # Find the ingress rules of the current SG
+    metadataOptions = plan.find_blocks(meta, "metadata_options") 
+
+    if length(metadataOptions)==0 {
+        print("Violation: IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj)
+        print("Metadata Option block not aviliable" ) 
+        violatingEc2Imdsv2 +=1
+    } else {
+        for metadataOptions as mdataObj, obj { 
+            if( obj.http_tokens else null is null or 
+                obj.http_tokens not in iMDSv2_http_token) {
+                print("Violation: IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj ) 
+                violatingEc2Imdsv2 +=1
+            }            
+        }
+    }
+}
+
+main = rule {
+    violatingEc2Imdsv2 is 0
+}

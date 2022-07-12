@@ -1,0 +1,24 @@
+###########################################################
+#Rule: Check CloudTrail configuration
+###########################################################
+#Checks whether AWS CloudTrail trails are configured 
+#to send logs to Amazon CloudWatch Logs.
+###########################################################
+import "tfplan-functions" as plan
+
+# Get all CloudTrail
+allCloudTrail = plan.find_resources("aws_cloudtrail") 
+violatingCloudTrail = 0
+
+for allCloudTrail as cloudTrailName, Obj {  
+    
+    if Obj.change.after.cloud_watch_logs_group_arn  else null is null { 
+        violatingCloudTrail +=1       
+        print("Violation: Cloud Watch Log Setting not configured for - ",cloudTrailName )
+    }
+    
+}
+
+main = rule {
+    violatingCloudTrail <= 0
+}

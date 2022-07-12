@@ -1,0 +1,19 @@
+import "tfplan/v2" as tfplan
+allrds = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_db_instance" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+validate_condition_rds = 0
+for allrds as _, rds{
+    # print(rds)
+    if rds["change"]["after"]["publicly_accessible"] is true {
+        validate_condition_rds = validate_condition_rds + 1
+        print("Violation: Rds", rds["address"], "is not private")
+    }
+}
+
+main = rule {
+    validate_condition_rds <= 0
+}

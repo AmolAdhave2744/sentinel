@@ -1,0 +1,52 @@
+###########################################################
+#Rule: Restrict Default Security Group
+###########################################################
+#CIS 4.3: Ensure the default security group of every VPC restricts all traffic.
+###########################################################
+import "tfplan/v2" as tfplan
+import "tfconfig/v2" as tfconfig
+allvpcs = filter tfconfig.resources as _, rc {
+    rc.type is "aws_vpc"
+}
+vpcaddresslist = []
+for allvpcs as _, vpc {
+    append(vpcaddresslist, vpc["address"])
+}
+# print(vpcaddresslist)
+allsgs = filter tfconfig.resources as _, rc {
+    rc.type is "aws_default_security_group"
+}
+alldefaultsglist = []
+for allsgs as _, sgs {
+    # append(alldefaultsglist, vpc["address"])
+    append(alldefaultsglist, sgs["config"]["vpc_id"]["references"][1])
+}
+# print(alldefaultsglist)
+
+
+alldefaultsg = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_default_security_group" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op") and 
+    (rc.change.after contains "ingress" or rc.change.after contains "egress")
+}
+sgviolatingconditions = 0
+for alldefaultsg as _, sg {
+    sgviolatingconditions = sgviolatingconditions + 1
+    print("Violation: Default Security group have ingree/egress rules", sg["address"])
+}
+
+is_vpc_violating_condition = 0
+
+for vpcaddresslist as _, vpc {
+    if vpc not in alldefaultsglist{
+        is_vpc_violating_condition = is_vpc_violating_condition + 1
+        print("Violation: VPC dont have restricted default Security group", vpc)
+    }
+}
+
+
+main = rule {
+    sgviolatingconditions <= 0 and is_vpc_violating_condition <= 0
+}

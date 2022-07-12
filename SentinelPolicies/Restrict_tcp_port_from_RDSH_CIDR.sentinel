@@ -1,0 +1,76 @@
+###########################################################
+#Rule: Check ingress rule from RDSH CIDR
+###########################################################
+#Check whether the security group ingress rules with
+# port number 22 or 3389 are from RDSH CIDR only
+###########################################################
+import "tfplan-functions" as plan
+import "tfplan/v2" as tfplan
+
+param rdsh_cidrs default []
+forbidden_port = [22, 3389]
+# Get all Security Groups
+aws_security_group = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_security_group" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op") and 
+    rc.change.after contains "ingress"
+}
+violatingSGsCount = 0 
+
+for aws_security_group as sgName, sg {
+    # Find the ingress block of  current SG
+    ingressRules = plan.find_blocks(sg, "ingress") 
+
+    for ingressRules as ingressName, sg {
+        for forbidden_port as port {               
+            if (sg.cidr_blocks[0] else null is not null) and ( sg.cidr_blocks[0] not in rdsh_cidrs) and
+             sg.from_port <= port and sg.to_port >= port {
+                print("Violation: Port - ", string(port)," allowed from RDSH CIDR Only - " ,rdsh_cidrs)
+                violatingSGsCount += 1
+                print("Violation:")
+                print("================================")
+                print("Security Group Name:", sgName)
+                print("CIDR:", sg.cidr_blocks)
+                print("Port:") 
+                print("from_port =", string(sg.from_port))
+                print("to_port =", string(sg.to_port))
+                print("================================")
+            }
+        }
+    }
+}
+
+# Get all Security Group Ingress Rules
+aws_sg_rules = filter tfplan.resource_changes as address, rc {
+  rc.type is "aws_security_group_rule" and
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update" or
+   rc.change.actions contains "read" or rc.change.actions contains "no-op") and
+   rc.change.after.type is "ingress"
+} 
+violatingSGRulesCount = 0 
+
+for aws_sg_rules as sgName, sg {   
+    for forbidden_port as port {
+        if sg.change.after.cidr_blocks[0] else null is not null and 
+        sg.change.after.cidr_blocks[0] not in  rdsh_cidrs and  sg.change.after.from_port <= port and
+        sg.change.after.to_port >= port {
+            print("Violation: Port - ", string(port)," allowed from RDSH CIDR Only - ",rdsh_cidrs)
+            violatingSGRulesCount += 1
+            print("Violation:")
+            print("================================")
+            print("Security Group Rule Name:", sgName)
+            print("CIDR:", sg.change.after.cidr_blocks)
+            print("Port:") 
+            print("from_port =", string(sg.change.after.from_port))
+            print("to_port =", string(sg.change.after.to_port))
+            print("================================")
+        }
+    } 
+}
+    
+main = rule {
+    violatingSGsCount is 0 and violatingSGRulesCount is 0
+}

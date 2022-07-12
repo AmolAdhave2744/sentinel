@@ -1,0 +1,82 @@
+###########################################################
+#Rule: Check Unrestricted Traffic
+###########################################################
+#CIS 4.1: Ensure no security groups allow ingress from 0.0.0.0/0 to port 22 and 3389.
+###########################################################
+import "tfplan/v2" as tfplan
+# allowed_Ips = ["10.0.0.0/32", "10.10.0.0/32"]
+allsg = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_security_group" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op") and 
+    rc.change.after contains "ingress"
+    
+    }
+violatedrulecount = 0
+# ingressIps22 = [] 
+# ingressIps3389 = [] 
+
+for allsg as groupdetails, sg {
+    for sg["change"]["after"]["ingress"] as ingressrules, cidrs {
+        if "cidr_blocks" in keys(cidrs){
+            if cidrs["cidr_blocks"] contains "0.0.0.0/0" and cidrs["from_port"] <= 22 and cidrs["to_port"] >= 22 {
+                violatedrulecount = violatedrulecount+1
+                # print("Violation: Port 22 Open Not allowed in", sg["address"])
+                print("Violation:")
+                print("================================")
+
+                print("Security Group:", sg["address"])
+                print("CIDR: [0.0.0.0/0]")
+                print("Port:") 
+                print("to_port = 22 is not allowed")
+
+                print("================================")
+
+
+                
+            }
+            if cidrs["cidr_blocks"] contains "0.0.0.0/0" and cidrs["from_port"] <= 3389 and cidrs["to_port"] >= 3389 {
+                violatedrulecount = violatedrulecount+1
+                # print("Violation: Port 3389 Open Open Not allowed in ", sg["address"])
+                print("Violation:")
+                print("================================")
+
+                print("Security Group:", sg["address"])
+                print("CIDR: [0.0.0.0/0]")
+                print("Port:") 
+                print("to_port = 3389 is not allowed")
+
+                print("================================")
+            }
+        }
+}
+}
+# for allsg as groupdetails, sg {
+#     for sg["change"]["after"]["ingress"] as ingressrules, cidrs {
+#         if cidrs["from_port"] <= 22 and cidrs["to_port"] >= 22 {
+#             append(ingressIps22, cidrs["cidr_blocks"][0])
+#         }
+#         if cidrs["from_port"] <= 3389 and cidrs["to_port"] >= 3389 {
+#             append(ingressIps3389, cidrs["cidr_blocks"][0])
+#         }
+#     }}
+# # print(ingressIps22)
+# # print(ingressIps3389)
+# for ingressIps22 as _, ip {
+#     if ip not in allowed_Ips{
+#         violatedrulecount = violatedrulecount+1
+#         print("Port 22 not allowed for IP - ", ip)
+#     }
+# }
+# for ingressIps3389 as _, ip {
+#     if ip not in allowed_Ips{
+#         violatedrulecount = violatedrulecount+1
+#         print("Port 3389 not allowed for IP - ", ip)
+#     }
+# }
+
+main = rule {
+    violatedrulecount <= 0
+
+}

@@ -1,0 +1,41 @@
+###########################################################
+#Rule: Check specific entry on Security Group Rule
+###########################################################
+# Ensure that routing traffic within the CSPs environment is controlled (e.g. using Network ACL and Security Groups).
+###########################################################
+import "tfplan/v2" as tfplan
+param mandatory_sg_entry default []
+# mandatory_entry = [{"cidr_blocks" :"10.10.0.0/32" , "from_port":22 , "to_port":22}]
+allrule = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_security_group_rule" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op") and 
+    rc.change.after.type is "ingress"
+    }
+ingressIps22 = [] 
+ingressIps3389 = []    
+mandatory_entry_present = 0
+current_rule = []
+violation_rule = 0
+
+# pass_Rule = false
+for allrule as groupdetails, sg {
+    count = 0
+    for mandatory_sg_entry as _, entry{
+        if sg["change"]["after"]["cidr_blocks"] is not null{
+            if entry["cidr_blocks"] in sg["change"]["after"]["cidr_blocks"] and entry["from_port"] == sg["change"]["after"]["from_port"] and entry["to_port"] == sg["change"]["after"]["to_port"] {
+                # print("Entry Matched for ", sg["address"])
+                count = count+1
+        }
+        }
+
+    if count != length(mandatory_sg_entry){
+        violation_rule = violation_rule + 1
+        print("Violation: Mandatory Entry is not present in the Security Group Rule -", sg["address"])
+    }}
+}
+main = rule {
+    violation_rule <= 0
+}
+

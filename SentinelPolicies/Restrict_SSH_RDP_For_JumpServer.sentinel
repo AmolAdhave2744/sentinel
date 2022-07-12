@@ -1,0 +1,60 @@
+###########################################################
+#Rule: Restrict Access from JumpServer
+###########################################################
+#For MXX administration, further authentication and authorisation, 
+#such as AWS Single Sign-On (SSO) and Access Management (IAM) policies, 
+#are required before the administrators can access the administrative console. 
+#In addition, for access to the EC2’s instance in MXX, 
+#administrators will be required to go through the provisioned Jumphosts after being 
+#authenticated through the AWS SSO.
+###########################################################
+import "tfplan/v2" as tfplan
+param allowed_Ips default []
+# allowed_Ips = ["10.10.0.0/32"]
+allsg = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_security_group" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op") and 
+    rc.change.after contains "ingress"
+    
+    }
+violatedrulecount = 0
+ingressIps22 = [] 
+ingressIps3389 = [] 
+pass_Rule = false 
+for allsg as groupdetails, sg {
+    for sg["change"]["after"]["ingress"] as ingressrules, cidrs {
+        if cidrs["from_port"] <= 22 and cidrs["to_port"] >= 22 {
+            append(ingressIps22, cidrs["cidr_blocks"][0])
+        }
+        if cidrs["from_port"] <= 3389 and cidrs["to_port"] >= 3389 {
+            append(ingressIps3389, cidrs["cidr_blocks"][0])
+        }
+    if sg["change"]["after"]["tags"] is not null {
+        for sg["change"]["after"] as _, tag {
+            if tag["Name"] == "jumpserver"{
+                pass_Rule = true
+            }
+    }
+    }}}
+
+# print(ingressIps22)
+# print(ingressIps3389)
+for ingressIps22 as _, ip {
+    if ip not in allowed_Ips{
+        violatedrulecount = violatedrulecount+1
+        print("Port 22 not allowed for IP - ", ip)
+    }
+}
+for ingressIps3389 as _, ip {
+    if ip not in allowed_Ips{
+        violatedrulecount = violatedrulecount+1
+        print("Port 3389 not allowed for IP - ", ip)
+    }
+}
+
+main = rule {
+    violatedrulecount <= 0 or pass_Rule == true
+
+}

@@ -1,0 +1,24 @@
+###########################################################
+#Rule: Check CloudTrail configuration
+###########################################################
+#Checks whether AWS CloudTrail is configured to use the server
+#side encryption (SSE) AWS Key Management Service (AWS KMS) 
+#customer master key (CMK) encryption.
+###########################################################
+import "tfplan-functions" as plan
+
+# Get all CloudTrail
+allCloudTrail = plan.find_resources("aws_cloudtrail") 
+violatingCloudTrail = 0
+
+for allCloudTrail as cloudTrailName, Obj {  
+       
+    if Obj.change.after.kms_key_id  else null is null { 
+        violatingCloudTrail +=1       
+        print("Violation: CloudTrail Encryption Setting not configured for - ",cloudTrailName )
+    }
+}
+
+main = rule {
+    violatingCloudTrail <= 0
+}

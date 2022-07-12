@@ -1,0 +1,24 @@
+###########################################################
+#Rule: Check WAF is implemented or not
+###########################################################
+# Web Application Firewall (WAF) shall be deployed to safeguard the protection of Application.
+###########################################################
+import "tfplan/v2" as tfplan
+allfront = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_cloudfront_distribution" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+validate_condition = 0
+for allfront as _, front {
+    if "web_acl_id" not in keys(front["change"]["after_unknown"]) {
+        validate_condition = validate_condition + 1
+        print("Violation: web_acl_id not found for - ", front["address"])
+    } else if front["change"]["after_unknown"]["web_acl_id"] is not true {
+        validate_condition = validate_condition + 1
+        print("Violation: WAF is not assciated with One or more Cloudfront Destribution")
+    }}
+main = rule{
+    validate_condition <= 0 
+}

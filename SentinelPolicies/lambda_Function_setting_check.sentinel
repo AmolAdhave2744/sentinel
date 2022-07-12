@@ -1,0 +1,50 @@
+###########################################################
+#Rule: Check lambda function settings
+###########################################################
+#Checks that the lambda function settings for runtime, role, 
+#timeout, and memory size match the expected values.
+###########################################################
+import "tfplan-functions" as plan
+
+param lambda_runtimeValue default  []   # ["nodejs10.x"]
+param lambda_roleValue default  []      # ["arn:aws:iam::1122:role/iam_role" ]
+param lambda_timeOutValue default  3    # AWS Default 3 
+param lambda_memsizeValue default  128  # AWS Default 128
+ 
+# Get all Lambda
+allLambdaList = plan.find_resources("aws_lambda_function")
+
+violatingLambdaRuntime = 0
+violatingLambdaRole = 0
+violatingLambdaTimeOut = 0
+violatingLambdaMemSize = 0
+
+for allLambdaList as lambdaName, Obj {
+    # Validate Runtime   
+    if Obj.change.after.runtime else null is null or 
+    Obj.change.after.runtime not in lambda_runtimeValue {
+        violatingLambdaRuntime +=1
+        print("Violation: Runtime error for Lambda - ",lambdaName )
+    } 
+    # Validate Role   
+    if Obj.change.after.role else null is null or 
+    Obj.change.after.role not in lambda_roleValue {
+        violatingLambdaRole +=1
+        print("Violation: Role error for Lambda - ",lambdaName )
+    } 
+    # Validate TimeOut   
+    if  int (Obj.change.after.timeout) != lambda_timeOutValue {
+        violatingLambdaTimeOut +=1
+        print("Violation: TimeOut error for Lambda - ",lambdaName )
+    }  
+    # Validate Memory Size   
+    if  int (Obj.change.after.memory_size) != lambda_memsizeValue {
+        violatingLambdaMemSize +=1
+        print("Violation: Memory Size error for Lambda - ",lambdaName )
+    }
+}
+validated = violatingLambdaRuntime is 0 and violatingLambdaRole is 0 and violatingLambdaTimeOut is 0 and violatingLambdaMemSize is 0
+
+main = rule {
+    validated is true
+}

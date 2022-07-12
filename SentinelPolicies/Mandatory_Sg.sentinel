@@ -1,0 +1,30 @@
+###########################################################
+#Rule: Check Mandatory Entry in Security Group
+###########################################################
+# Cloud native network firewalls, such as AWS Security Groups, shall be implemented.
+###########################################################
+import "tfplan/v2" as tfplan
+param Mandatory_Sg default []
+# Mandatory_Sg = ["sg-010b379d0802634f2"]
+allec2 = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_instance" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+validate_condition = 0
+for allec2 as _, ec2 {  
+    if "security_groups" not in keys(ec2["change"]["after"]){
+        validate_condition = validate_condition + 1
+        print("Violation: Mandatory Security Group missing in", ec2["address"])
+    } else {
+        for Mandatory_Sg as _, sg {
+            if sg not in ec2["change"]["after"]["security_groups"] {
+                print("Violation: ", sg, "Mandatory Security Group missing in ", ec2["address"])
+                validate_condition = validate_condition + 1
+            }}
+    }
+}
+main = rule {
+    validate_condition <= 0 
+}
