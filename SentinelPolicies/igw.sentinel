@@ -1,25 +1,18 @@
-
-### find_all_outputs ###
-# Find all outputs using the tfconfig/v2 import.
 import "tfplan/v2" as tfplan
 import "tfconfig/v2" as tfconfig
 
 
 print("tfconfig ",tfconfig)
-print("tfplan ",tfplan)
-find_all_outputs = func() {
+print("tfplan ",tfplan) 
     
-  print("find_datasources_in_module ", tfconfig.outputs)
-  return tfconfig.outputs
-}
+print("find_datasources_in_module ", tfconfig.outputs)
 
-find_all_datasources = func() {
-  datasources = filter tfconfig.resources as address, d {
-  	d.mode is "data"
-  }
-  print("find_all_datasources ",datasources)
-  return datasources
+datasources = filter tfconfig.resources as address, d {
+d.mode is "data"
 }
+print("find_all_datasources ",datasources)
+ 
+
 
 
 validate_condition = 0 
