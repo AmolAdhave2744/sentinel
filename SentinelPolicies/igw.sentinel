@@ -6,6 +6,8 @@ import "tfstate/v2" as tfstate
 print("tfconfig ", tfconfig.outputs)
 print("tfplan ", tfplan.outputs)
 print("tfstate ", tfstate.outputs)
+print("tfstate ", tfstate.outputs.account_id)
+print("tfstate ", tfstate.outputs.account_id.value)
 
 datasources = filter tfconfig.resources as address, d {
 d.mode is "data"
