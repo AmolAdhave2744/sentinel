@@ -19,8 +19,9 @@ print("account check",current_aws_id in aws_account_id)
  for aws_account_id as allowed_id {
     print(" id check",(current_aws_id != allowed_id) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
     print(" length check", (length(igw) > 0 ) , length(igw))
-    if((current_aws_id != allowed_id) and (length(igw) > 0 ))
-    print("Violation: Account Id", current_aws_id ," not allowed to create Internet gateway")
+    if((current_aws_id != allowed_id) and (length(igw) > 0 )) {
+        print("Violation: Account Id", current_aws_id ," not allowed to create Internet gateway")
+    }
  }
 
 # Count violations
