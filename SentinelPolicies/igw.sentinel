@@ -19,7 +19,6 @@ violations=0
 if((int(current_aws_id)  not in  aws_allowed_account_id ) and (length(igw) > 0 )) {
     violations +=1
     print("Violation: Account Id - ", current_aws_id ," not allowed to create Internet gateway")
-    print("Allowed AWS Account Id : " , string(aws_allowed_account_id))
 }
 main = rule {
     violations <= 0 
