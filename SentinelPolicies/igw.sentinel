@@ -8,10 +8,18 @@ current_aws_id=tfstate.outputs.account_id.value
 
 igw = plan.find_resources("aws_internet_gateway")
  
+    print("aws_allowed_account_id account check",current_aws_id not in aws_allowed_account_id)
 # Count violations
 violations=0
 for aws_allowed_account_id as allowed_id {
-    print("account check",current_aws_id not in string(allowed_id))
+    print("  current_aws_id ",current_aws_id , "String " string(current_aws_id) )
+    print("  current_aws_id ",allowed_id , "String " string(allowed_id) )
+    print(" IN current_aws_id ",allowed_id not in  allowed_id) 
+    print(" IN str  current_aws_id ",string(allowed_id) not in  string(allowed_id) )
+    print(" contains current_aws_id ",allowed_id not contains  allowed_id) 
+    print(" contains str  current_aws_id ",string(allowed_id) not contains  string(allowed_id) )
+    
+    print("account check",current_aws_id not in string(allowed_id),"string(allowed_id)",string(allowed_id))
     print(" id check",(string(current_aws_id) not contains string(allowed_id)) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
   
     if((string(current_aws_id) not contains string(allowed_id)) and (length(igw) > 0 )) {
