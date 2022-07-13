@@ -2,7 +2,7 @@ module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
 
-policy "igw" {
+policy "ec2_public_ip" {
    enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/igw.sentinel"
+   source = "./SentinelPolicies/ec2_public_ip.sentinel"
 }
