@@ -11,12 +11,12 @@ igw = filter tfplan.resource_changes as address, rc {
    rc.change.actions contains "read" or rc.change.actions contains "no-op")  
 }
 print("length igw ",length(igw)) 
-print("account check",current_aws_id in aws_account_id)
+print("account check",current_aws_id not contains aws_account_id)
  
 # Count violations
 violations=0
 for aws_account_id as allowed_id {
-    print(" id check",(current_aws_id != allowed_id) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
+    print(" id check",(string(current_aws_id) not contains string(allowed_id)) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
     print(" length check", (length(igw) > 0 ) , length(igw))
     if((current_aws_id != allowed_id) and (length(igw) > 0 )) {
         violations +=1
