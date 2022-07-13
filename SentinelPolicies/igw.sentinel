@@ -9,8 +9,7 @@ igw = filter tfplan.resource_changes as address, rc {
   rc.type is "aws_internet_gateway" and
   rc.mode is "managed" and
   (rc.change.actions contains "create" or rc.change.actions contains "update" or
-   rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-   rc.change.after.vpc_id is not null 
+   rc.change.actions contains "read" or rc.change.actions contains "no-op")  
 }
 print("length igw ",length(igw)) 
 print("account check",current_aws_id in aws_account_id)
@@ -20,7 +19,8 @@ print("account check",current_aws_id in aws_account_id)
     print(" id check",(current_aws_id != allowed_id) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
     print(" length check", (length(igw) > 0 ) , length(igw))
     if((current_aws_id != allowed_id) and (length(igw) > 0 )) {
-        print("Violation: Account Id", current_aws_id ," not allowed to create Internet gateway")
+        violations +=1
+        print("Violation: Account Id - ", current_aws_id ," not allowed to create Internet gateway")
     }
  }
 
