@@ -10,7 +10,7 @@ alltgw = filter tfplan.resource_changes as _, rc {
 }
 
 validate_condition = 0
-for alltgw as _, tgw{
+for alltgw as _, igw{
     print(tgw) 
 }
 
