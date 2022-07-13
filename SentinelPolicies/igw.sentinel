@@ -13,7 +13,7 @@ current_aws_id=tfstate.outputs.account_id.value
 print(" INt  current_aws_id ",int(current_aws_id)  )
 print(" IN str  current_aws_id ",int(current_aws_id)  in  aws_allowed_account_id ) 
 print(" Str  current_aws_id ",int(current_aws_id)  )
-print(" IN str  current_aws_id ",String(current_aws_id)  in  aws_allowed_account_id ) 
+print(" IN str  current_aws_id ",string(current_aws_id)  in  aws_allowed_account_id ) 
 print(" float  current_aws_id ",float(current_aws_id)  )
 print(" contains str  current_aws_id ",aws_allowed_account_id  contains  float(current_aws_id) )
 
