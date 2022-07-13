@@ -1,7 +1,6 @@
 import "tfplan/v2" as tfplan
 import "tfstate/v2" as tfstate
 
-  
 param aws_account_id default  [955766821354, 3064333]
 current_aws_id=tfstate.outputs.account_id.value 
 
@@ -14,20 +13,17 @@ igw = filter tfplan.resource_changes as address, rc {
 print("length igw ",length(igw)) 
 print("account check",current_aws_id in aws_account_id)
  
- 
- for aws_account_id as allowed_id {
+# Count violations
+violations=0
+for aws_account_id as allowed_id {
     print(" id check",(current_aws_id != allowed_id) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
     print(" length check", (length(igw) > 0 ) , length(igw))
     if((current_aws_id != allowed_id) and (length(igw) > 0 )) {
         violations +=1
         print("Violation: Account Id - ", current_aws_id ," not allowed to create Internet gateway")
     }
- }
+}
 
-# Count violations
-violations=0
-# violations = length(igw["messages"]) is 0 and current_aws_id in aws_account_id
- 
 main = rule {
     violations <= 0 
 }
