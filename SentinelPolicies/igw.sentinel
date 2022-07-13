@@ -10,28 +10,19 @@ import "tfstate/v2" as tfstate
 param aws_allowed_account_id default []  # [955766821354, 3064333]
 # get current account id from Data source
 current_aws_id=tfstate.outputs.account_id.value 
-print(" INt  current_aws_id ",int(current_aws_id)  )
-print(" IN str  current_aws_id ",int(current_aws_id)  in  aws_allowed_account_id ) 
-print(" Str  current_aws_id ",int(current_aws_id)  )
-print(" IN str  current_aws_id ",string(current_aws_id)  in  aws_allowed_account_id ) 
-print(" float  current_aws_id ",float(current_aws_id)  )
-print(" contains str  current_aws_id ",aws_allowed_account_id  contains  float(current_aws_id) )
+print(" INt  current_aws_id ",int("32432432")  )
+print(" IN str  current_aws_id ",int(current_aws_id)    )  
 
 
 igw = plan.find_resources("aws_internet_gateway")
    
 # Count violations
 violations=0
-for aws_allowed_account_id as allowed_id {
-    print("  current_aws_id ",current_aws_id , "String " ,string(current_aws_id) )
-    print("  current_aws_id ",allowed_id , "String " ,string(allowed_id) ) 
 
-    if((string(current_aws_id) not contains string(allowed_id)) and (length(igw) > 0 )) {
-        violations +=1
-        print("Violation: Account Id - ", current_aws_id ," not allowed to create Internet gateway")
-    }
+if((int(current_aws_id)  not in  aws_allowed_account_id ) and (length(igw) > 0 )) {
+    violations +=1
+    print("Violation: Account Id - ", current_aws_id ," not allowed to create Internet gateway")
 }
-
 main = rule {
     violations <= 0 
 }
