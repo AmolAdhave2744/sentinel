@@ -1,7 +1,7 @@
 import "tfplan-functions" as plan 
 import "tfstate/v2" as tfstate
 
-param aws_allowed_account_id default # [955766821354, 3064333]
+param aws_allowed_account_id default []  # [955766821354, 3064333]
 
 # get current account id from Data source
 current_aws_id=tfstate.outputs.account_id.value 
