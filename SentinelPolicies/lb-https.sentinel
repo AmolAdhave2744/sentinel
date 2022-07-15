@@ -18,7 +18,6 @@ externallb = []
 for alllistenerrule as _, lrule{
     if lrule["config"]["port"]["constant_value"] is "443" {
         append(allhttpsenabled443, lrule["config"]["load_balancer_arn"]["references"][1])
-        print(lrule["config"]["load_balancer_arn"]["references"][1])
     }
     
     # print(lrule["config"]["protocol"]["constant_value"])
@@ -35,7 +34,7 @@ for allllb as _, lb {
     #     append(externallb, lb["address"])
     # }
     if lb["address"] not in allhttpsenabled443 {
-    print("Violation: HTTPS/Port 443 not enabled on", lb)
+    print("Violation: HTTPS/Port 443 not enabled on", lb["address"])
     validate_condition = validate_condition + 1
     }
 
