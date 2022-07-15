@@ -34,8 +34,7 @@ for allllb as _, lb {
     # if lb["config"]["internal"]["constant_value"] is false {
     #     append(externallb, lb["address"])
     # }
-    if lb not in allhttpsenabled443 {
-    print(lb)
+    if lb["address"] not in allhttpsenabled443 {
     print("Violation: HTTPS/Port 443 not enabled on", lb)
     validate_condition = validate_condition + 1
     }
