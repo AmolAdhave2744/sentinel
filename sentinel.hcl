@@ -4,5 +4,5 @@ module "tfplan-functions" {
 
 policy "empty_default_sg.sentinel" {
    enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/empty_default_sg.sentinel.sentinel"
+   source = "./SentinelPolicies/empty_default_sg.sentinel"
 }
