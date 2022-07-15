@@ -5,19 +5,19 @@
 import "tfplan/v2" as tfplan
 
 # Get all aws_instance
-aws_instance = filter tfplan.resource_changes as _, rc {
+all_intances = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_instance" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-    rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-    (rc.change.after.ebs_optimized else null is null or rc.change.after.ebs_optimized is false )
+    rc.change.actions contains "read" or rc.change.actions contains "no-op") 
+    # and
+    # (rc.change.after.ebs_optimized else null is null or rc.change.after.ebs_optimized is false )
 
 }
 violatingEc2keypair = 0 
 
-for aws_instance as ec2, obj { 
-    violatingEc2keypair +=1
-    print("Violation: Ec2 keypair is not attached for Ec2 Instance - ",ec2 )  
+for all_intances as _, instance {
+    print(instance)
 }
 main = rule {
     violatingEc2keypair is 0
