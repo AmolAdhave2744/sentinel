@@ -1,3 +1,4 @@
+/*
 ###########################################################
 #Rule: Internet Gateway Allowed to specific AWS Account Id
 ###########################################################
@@ -66,3 +67,4 @@ if(int(current_aws_id)  not in  aws_allowed_account_id ){
 main = rule {
     ec2_public_ip_violations <= 0 
 }
+*/
