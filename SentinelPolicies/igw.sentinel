@@ -1,0 +1,25 @@
+###########################################################
+#Rule: Internet Gateway Allowed to specific AWS Account Id
+###########################################################
+# An internet gateway shall be set up to protect
+# internet ingress and egress traffic from public users accessing the MXX.
+###########################################################
+import "tfplan-functions" as plan 
+import "tfstate/v2" as tfstate
+
+param aws_allowed_account_id default []  # [995566778899, 3064333]
+# get current account id from Data source
+current_aws_id=tfstate.outputs.account_id.value 
+
+igw = plan.find_resources("aws_internet_gateway")
+   
+# Count violations
+violations=0
+
+if((int(current_aws_id)  not in  aws_allowed_account_id ) and (length(igw) > 0 )) {
+    violations +=1
+    print("Violation: Account Id - ", current_aws_id ," not allowed to create Internet gateway")
+}
+main = rule {
+    violations <= 0 
+}
