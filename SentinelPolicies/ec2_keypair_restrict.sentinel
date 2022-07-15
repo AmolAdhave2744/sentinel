@@ -17,7 +17,13 @@ all_intances = filter tfplan.resource_changes as _, rc {
 violatingEc2keypair = 0 
 
 for all_intances as _, instance {
-    print(instance)
+    if "key_name" in keys.instance["after"]{
+        print(instance["change"]["after"]["key_name"])
+        print("Violation: Instance can not be launched with Key:-", instance["address"])
+        violatingEc2keypair = violatingEc2keypair + 1
+    } else {
+     print("Intance has not key associated - ", instance["address"])   
+    }
 }
 main = rule {
     violatingEc2keypair is 0
