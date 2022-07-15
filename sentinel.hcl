@@ -2,7 +2,7 @@ module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
 
-policy "ec2_keypair_restrict.sentinel" {
-   enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/ec2_keypair_restrict.sentinel"
+policy "lb-https.sentinel" {
+   enforcement_level = "soft-mandatory"
+   source = "./SentinelPolicies/lb-https.sentinel"
 }

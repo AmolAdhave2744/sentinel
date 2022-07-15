@@ -30,17 +30,22 @@ for alllistenerrule as _, lrule{
 }
 validate_condition = 0
 for allllb as _, lb {
-    if lb["config"]["internal"]["constant_value"] is false {
-        append(externallb, lb["address"])
+    # if lb["config"]["internal"]["constant_value"] is false {
+    #     append(externallb, lb["address"])
+    # }
+    if lb not in allhttpsenabled443 {
+    print("Violation: HTTPS/Port 443 not enabled on", lb)
+    validate_condition = validate_condition + 1
     }
+
 }
 
-for externallb as _, lb {
-    if lb not in allhttpsenabled443 {
-        print("Violation: HTTPS/Port 443 not enabled on", lb)
-        validate_condition = validate_condition + 1
-    }
-}
+# for externallb as _, lb {
+#     if lb not in allhttpsenabled443 {
+#         print("Violation: HTTPS/Port 443 not enabled on", lb)
+#         validate_condition = validate_condition + 1
+#     }
+# }
 
 main = rule {
     validate_condition <= 0 
