@@ -12,10 +12,13 @@ allEc2s = plan.find_resources("aws_instance")
 violatingEc2Imdsv2 = 0
 
 for allEc2s as ec2Obj, meta { 
-
+print("meta Option ",meta ) 
     # Find the ingress rules of the current SG
     metadataOptions = plan.find_blocks(meta, "metadata_options") 
-
+    imdsv1 = false
+    # if(meta.tags["mcc-r-imdsv1"] is "true") {
+    #     imdsv1 = true
+    # }
     if length(metadataOptions)==0 {
         print("Violation: IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj)
         print("Metadata Option block not aviliable" ) 
@@ -26,7 +29,10 @@ for allEc2s as ec2Obj, meta {
                 obj.http_tokens not in iMDSv2_http_token) {
                 print("Violation: IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj ) 
                 violatingEc2Imdsv2 +=1
-            }            
+            # } else if(imdsv1 is false){
+            #     print("Violation: IMDSv1 and IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj ) 
+            #     violatingEc2Imdsv2 +=1
+            }
         }
     }
 }
