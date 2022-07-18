@@ -16,8 +16,8 @@ for allEc2s as ec2Obj, meta {
 print("meta Option ",meta ) 
 print("tags Option ", meta.tags)
 # print("tags Option ", meta[tags])
-print("tags Option ",  plan.filter_attribute_not_contains_list(meta,
-                        "tags", tg, true))
+# print("tags Option ",  plan.filter_attribute_not_contains_list(meta,
+#                         "tags", tg, true))
 # print("tags Option ", meta.tags["mcc-r-imdsv1"])
     # Find the ingress rules of the current SG
     metadataOptions = plan.find_blocks(meta, "metadata_options") 
