@@ -12,12 +12,16 @@ allEc2s = plan.find_resources("aws_instance")
 violatingEc2Imdsv2 = 0
 
 for allEc2s as ec2Obj, meta { 
-# print("meta Option ",meta ) 
+print("meta Option ",meta ) 
 print("tags Option ", meta.tags)
+print("tags Option ", meta[tags])
+print("tags Option ",  plan.filter_attribute_not_contains_list(meta,
+                        "tags", "mcc-r-imdsv1", true)
 # print("tags Option ", meta.tags["mcc-r-imdsv1"])
     # Find the ingress rules of the current SG
     metadataOptions = plan.find_blocks(meta, "metadata_options") 
     imdsv1 = false
+
     # if(meta.tags["mcc-r-imdsv1"] is "true") {
     #     imdsv1 = true
     # }

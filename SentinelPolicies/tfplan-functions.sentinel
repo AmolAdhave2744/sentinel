@@ -60,3 +60,51 @@ find_blocks = func(parent, child) {
     }
   }
 }
+
+
+### filter_attribute_not_contains_list ###
+# Filter a list of resources to those with a specified
+# attribute (attr) that does not contain a given list of required values (required).
+# Set prtmsg to `true` (without quotes) if you want to print violation messages.
+# Resources should be derived by applying filters to tfplan.resource_changes.
+filter_attribute_not_contains_list = func(resources, attr, required, prtmsg) {
+  violators = {}
+  messages = {}
+  for resources as address, rc {
+    # Evaluate the value (v) of the attribute
+    v = evaluate_attribute(rc, attr) else null
+    # Check if the value contains the desired allowed list
+    if v is null or
+       not (types.type_of(v) is "list" or types.type_of(v) is "map") {
+      # Add the resource and a warning message to the violators list
+      message = to_string(address) + " has " + to_string(attr) +
+                " that is missing, null, or is not a map or a list. " + "It should have had these items: " + to_string(required)
+      violators[address] = rc
+      messages[address] = message
+      if prtmsg {
+        print(message)
+      }
+    } else {
+      missing_values = []
+      for required as rv {
+        if v not contains rv {
+          append(missing_values, rv)
+        } // end if
+      } // end for required
+      if length(missing_values) > 0 {
+        # Build warning message when v is a map
+        message = to_string(address) + " has " + to_string(attr) + " " +
+                  to_string(v) + " that is missing the required items " +
+                  to_string(missing_values) + " from the list: " +
+                  to_string(required)
+        # Add the resource and warning message to the violators list
+        violators[address] = rc
+        messages[address] = message
+        if prtmsg {
+          print(message)
+        }
+      } // end length(missing_values)
+    } // end else v not null
+  } // end for
+  return {"resources":violators,"messages":messages}
+}
