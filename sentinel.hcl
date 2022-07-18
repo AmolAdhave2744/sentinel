@@ -5,7 +5,3 @@ policy "ec2_IMDSv2_check" {
    enforcement_level = "hard-mandatory"
    source = "./SentinelPolicies/ec2_IMDSv2_check.sentinel"
 }
-# policy "aws_lb_access_logs.sentinel" {
-#    enforcement_level = "hard-mandatory"
-#    source = "./SentinelPolicies/aws_lb_access_logs.sentinel"
-# }
