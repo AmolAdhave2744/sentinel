@@ -13,7 +13,7 @@ violatingEc2Imdsv2 = 0
 
 for allEc2s as ec2Obj, meta { 
 # print("meta Option ",meta ) 
-print("tags Option ", plan.find_blocks(meta, "tags" )
+print("tags Option ", plan.find_blocks(meta, "tags" ))
     # Find the ingress rules of the current SG
     metadataOptions = plan.find_blocks(meta, "metadata_options") 
     imdsv1 = false
