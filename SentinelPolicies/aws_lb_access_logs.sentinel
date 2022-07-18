@@ -13,7 +13,7 @@ all_lb = filter tfplan.resource_changes as _, rc {
 violatingAccessLogs = 0
 for all_lb as _, lb{
 	if "access_logs" in alb(lb["change"]["after"]){
-	print(lb["change"]["after"]{"access_logs"])
+	print(lb["change"]["after"]["access_logs"])
 	print("Violation: LoadBalancer can not be launched with logs:-", lb["address"])
     violatingAccessLogs = violatingAccessLogs + 1
 } else {
