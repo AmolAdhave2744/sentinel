@@ -1,7 +1,7 @@
 module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
-policy "ec2_IMDSv2_check" {
+policy "aws_lb_access_logs" {
    enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/ec2_IMDSv2_check.sentinel"
+   source = "./SentinelPolicies/aws_lb_access_logs.sentinel"
 }
