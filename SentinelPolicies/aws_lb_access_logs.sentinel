@@ -3,18 +3,23 @@ import "tfstate/v2" as tfstate
 
 #param network_account_ID default "123456789"
 #network_account_ID = "123456789"
-accesslogs = filter tfplan.resource_changes as _, rc {
+all_lb = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_lb" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
 
-validate_condition = 0
-for accesslogs as _, lb{
-    print(lb) 
+violatingAccessLogs = 0
+for all_lb as _, lb{
+	if "access_logs" in alb(lb["change"]["after"]){
+	print(lb["change"]["after"]{"access_logs"])
+	print("Violation: LoadBalancer can not be launched with logs:-", lb["address"])
+    violatingAccessLogs = violatingAccessLogs + 1) 
+} else {
+	Print("LoadBalancer has not logs associated - ", lb["address"])
+	}
 }
-
 main = rule {
-    validate_condition <= 0 
+   violatingAccessLogs is 0
 }
