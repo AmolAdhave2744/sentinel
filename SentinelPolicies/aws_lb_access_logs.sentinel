@@ -13,9 +13,10 @@ all_lb = filter tfplan.resource_changes as _, rc {
 violatingAccessLogs = 0
 for all_lb as _, lb{
 	if "access_logs" in keys(lb["change"]["after"]){
-	print(lb["change"]["after"]["access_logs"])
-	print("Violation: LoadBalancer can not be launched with logs:-", lb["address"])
-    violatingAccessLogs = violatingAccessLogs + 1
+	print(lb["change"]["after"]["access_logs"]["enabled"])
+        if lb["change"]["after"]["access_logs"]["enabled"] == false
+	        print("Violation: LoadBalancer can not be launched with logs:-", lb["address"])
+            violatingAccessLogs = violatingAccessLogs + 1
 } else {
 	Print("LoadBalancer has not logs associated - ", lb["address"])
 	}
