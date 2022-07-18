@@ -15,6 +15,7 @@ print("length lb ",length(lb))
  
 # Count violations
 violations=0
+/*
 for access_logs as lb {
     print(" id check",(current_aws_id != allowed_id) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
     print(" length check", (length(lb) > 0 ) , length(lb))
@@ -23,7 +24,7 @@ for access_logs as lb {
         print("Violation: Account Id - ", current_aws_id ," not allowed to load balancer")
     }
 }
-
+*/
 main = rule {
     violations <= 0 
 }
