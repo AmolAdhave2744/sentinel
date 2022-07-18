@@ -160,3 +160,49 @@ evaluate_attribute = func(r, attribute) {
 
   }
 }
+
+
+
+### to_string ###
+# Convert objects of unknown type to string
+# It is used to build messages added to the messages map returned by the
+# filter functions
+to_string = func(obj) {
+  case types.type_of(obj) {
+    when "string":
+      return obj
+    when "int", "float", "bool":
+      return string(obj)
+    when "null":
+      return "null"
+    when "undefined":
+      return "undefined"
+    when "list":
+      output = "["
+      lastIndex = length(obj) - 1
+      for obj as index, value {
+        if index < lastIndex {
+          output += to_string(value) + ", "
+        } else {
+          output += to_string(value)
+        }
+      }
+      output += "]"
+      return output
+    when "map":
+      output = "{"
+      theKeys = keys(obj)
+      lastIndex = length(theKeys) - 1
+      for theKeys as index, key {
+        if index < lastIndex {
+          output += to_string(key) + ": " + to_string(obj[key]) + ", "
+        } else {
+          output += to_string(key) + ": " + to_string(obj[key])
+        }
+      }
+      output += "}"
+      return output
+    else:
+      return ""
+  }
+}
