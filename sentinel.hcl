@@ -2,7 +2,7 @@ module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
 
-policy "lb-https.sentinel" {
+policy "ec2_IMDSv2_check.sentinel" {
    enforcement_level = "soft-mandatory"
-   source = "./SentinelPolicies/lb-https.sentinel"
+   source = "./SentinelPolicies/ec2_IMDSv2_check.sentinel"
 }
