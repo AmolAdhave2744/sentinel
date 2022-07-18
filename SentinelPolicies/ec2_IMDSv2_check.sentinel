@@ -16,8 +16,9 @@ for allEc2s as ec2Obj, meta {
     imdsv1 = false
     if(meta.change.after.tags["mcc-r-imdsv1"] else null is not null ) {
         imdsv1 = strings.to_lower(meta.change.after.tags["mcc-r-imdsv1"]) is "yes"
+        print("imdsv1",strings.to_lower(meta.change.after.tags["mcc-r-imdsv1"]) ) 
     }
-    print("imdsv1",strings.to_lower(meta.change.after.tags["mcc-r-imdsv1"]) ) 
+    
     metadataOptions = plan.find_blocks(meta, "metadata_options") 
 
     if length(metadataOptions)==0 {
