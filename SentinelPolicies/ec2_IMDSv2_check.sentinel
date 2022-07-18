@@ -10,6 +10,7 @@ iMDSv2_http_token=["required"]
 # Get all Ec2
 allEc2s = plan.find_resources("aws_instance")  
 violatingEc2Imdsv2 = 0
+param tg default [  "mcc-r-imdsv1" ]
 
 for allEc2s as ec2Obj, meta { 
 print("meta Option ",meta ) 
