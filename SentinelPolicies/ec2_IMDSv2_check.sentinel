@@ -1,46 +1,37 @@
 ###########################################################
-#Rule: Check Ec2 Instance configured IMDSv2
+#Rule: Check Ec2 Instance configured IMDSv2 or "mcc-r-imdsv1" is yes
 ###########################################################
 #Checks whether your Amazon Elastic Compute Cloud (Amazon EC2) instance
 #metadata version is configured with Instance Metadata Service Version 2 (IMDSv2).
 ###########################################################
 import "tfplan-functions" as plan
-import "tfstate/v2" as tfstate
+import "strings"
 iMDSv2_http_token=["required"]
 # Get all Ec2
 allEc2s = plan.find_resources("aws_instance")  
 violatingEc2Imdsv2 = 0
- tg = [  "mcc-r-imdsv1" ]
-ec_data=tfstate.outputs.ec2data.value 
-print(" ec_data ",ec_data ) 
-for allEc2s as ec2Obj, meta { 
-print("meta Option ",meta ) 
-print("tags 1 ", meta.change.after.tags)
-print("tags => ", meta.change.after.tags["mcc-r-imdsv1"])
-# print("tags Option ", meta[tags])
-# print("tags Option ",  plan.filter_attribute_not_contains_list(meta,
-#                         "tags", tg, true))
-# print("tags Option ", meta.tags["mcc-r-imdsv1"])
-    # Find the ingress rules of the current SG
-    metadataOptions = plan.find_blocks(meta, "metadata_options") 
-    imdsv1 = false
 
-    # if(meta.tags["mcc-r-imdsv1"] is "true") {
-    #     imdsv1 = true
-    # }
+for allEc2s as ec2Obj, meta { 
+    #Check imdsv1 tag from ec2 instance
+    imdsv1 = false
+    if(meta.change.after.tags["mcc-r-imdsv1"] else null is not null ) {
+        imdsv1 = strings.to_lower(meta.change.after.tags["mcc-r-imdsv1"]) is "yes"
+    }
+    print("imdsv1",strings.to_lower(meta.change.after.tags["mcc-r-imdsv1"]) ) 
+    metadataOptions = plan.find_blocks(meta, "metadata_options") 
+
     if length(metadataOptions)==0 {
-        print("Violation: IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj)
+        print("Violation: Instance Metadata Service IMDS not configured for Ec2 Instance Name - ",ec2Obj ) 
         print("Metadata Option block not aviliable" ) 
         violatingEc2Imdsv2 +=1
     } else {
         for metadataOptions as mdataObj, obj { 
             if( obj.http_tokens else null is null or 
-                obj.http_tokens not in iMDSv2_http_token) {
-                print("Violation: IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj ) 
-                violatingEc2Imdsv2 +=1
-            # } else if(imdsv1 is false){
-            #     print("Violation: IMDSv1 and IMDSv2 not configured for Ec2 Instance Name - ",ec2Obj ) 
-            #     violatingEc2Imdsv2 +=1
+                obj.http_tokens not in iMDSv2_http_token) {               
+                if(imdsv1 is false){
+                    violatingEc2Imdsv2 +=1
+                    print("Violation: Instance Metadata Service IMDS not configured for Ec2 Instance Name - ",ec2Obj ) 
+                } 
             }
         }
     }
