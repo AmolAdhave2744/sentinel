@@ -14,7 +14,7 @@ violatingAccessLogs = 0
 for all_lb as _, lb{
 	if "access_logs" in keys(lb["change"]["after"]){
 	print(lb["change"]["after"]["access_logs"][0]["enabled"])
-        if lb["change"]["after"]["access_logs"][0]["enabled"] == false {
+        if lb["change"]["after"]["access_logs"][0]["enabled"] == true {
 	        print("Violation: LoadBalancer can not be launched with logs:-", lb["address"])
             violatingAccessLogs = violatingAccessLogs + 1 
             }
