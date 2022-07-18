@@ -5,7 +5,7 @@
 #metadata version is configured with Instance Metadata Service Version 2 (IMDSv2).
 ###########################################################
 import "tfplan-functions" as plan
-
+import "tfstate/v2" as tfstate
 iMDSv2_http_token=["required"]
 # Get all Ec2
 allEc2s = plan.find_resources("aws_instance")  
