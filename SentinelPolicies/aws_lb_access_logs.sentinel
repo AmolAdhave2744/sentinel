@@ -1,0 +1,29 @@
+import "tfplan/v2" as tfplan
+import "tfstate/v2" as tfstate
+
+#param aws_account_id default  [955766821354, 3064333]
+#current_aws_id=tfstate.outputs.account_id.value 
+
+lb = filter tfplan.resource_changes as address, rc {
+  rc.type is "aws_lb" and
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update" or
+   rc.change.actions contains "read" or rc.change.actions contains "no-op")  
+}
+print("length lb ",length(lb)) 
+#print("account check",current_aws_id in aws_account_id)
+ 
+# Count violations
+violations=0
+for access_logs as lb {
+    print(" id check",(current_aws_id != allowed_id) ,"current_aws_id",current_aws_id,"allowed_id ", allowed_id)
+    print(" length check", (length(lb) > 0 ) , length(lb))
+    if((current_aws_id != allowed_id) and (length(igw) > 0 )) {
+        violations +=1
+        print("Violation: Account Id - ", current_aws_id ," not allowed to load balancer")
+    }
+}
+
+main = rule {
+    violations <= 0 
+}
