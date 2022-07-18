@@ -15,7 +15,8 @@ ec_data=tfstate.outputs.ec2data.value
 print(" ec_data ",ec_data ) 
 for allEc2s as ec2Obj, meta { 
 print("meta Option ",meta ) 
-print("tags Option ", meta.tags)
+print("tags 1 ", meta.change.after.tags)
+print("tags => ", meta.change.after.tags["mcc-r-imdsv1"])
 # print("tags Option ", meta[tags])
 # print("tags Option ",  plan.filter_attribute_not_contains_list(meta,
 #                         "tags", tg, true))
