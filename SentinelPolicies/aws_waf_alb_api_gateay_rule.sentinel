@@ -1,3 +1,6 @@
+import "tfplan/v2" as tfplan
+import "tfstate/v2" as tfstate
+
 #param network_account_ID default "123456789"
 #network_account_ID = "123456789"
 accesslogs = filter tfplan.resource_changes as _, rc {
