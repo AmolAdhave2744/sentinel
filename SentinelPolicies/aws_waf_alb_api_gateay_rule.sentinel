@@ -12,10 +12,10 @@ all_lb = filter tfplan.resource_changes as _, rc {
 
 validate_condition = 0
 for all_lb as _, lb{
-	if "enable_waf_fail_open" not in keys(front["change"]["afte"]) {
+	if "enable_waf_fail_open" not in keys(lb["change"]["after"]) {
         validate_condition = validate_condition + 1
-        print("Violation: enable_waf_fail_open not found for - ", front["address"])
-    } else if front["change"]["after"]["enable_waf_fail_open"] is not true {
+        print("Violation: enable_waf_fail_open not found for - ", lb["address"])
+    } else if lb["change"]["after"]["enable_waf_fail_open"] is not true {
         validate_condition = validate_condition + 1
         print("Violation: WAF is not assciated with One or more Application Load Balancers")
     }}
