@@ -3,7 +3,7 @@ import "tfstate/v2" as tfstate
 
 #param network_account_ID default "123456789"
 #network_account_ID = "123456789"
-accesslogs = filter tfplan.resource_changes as _, rc {
+wafimplementation = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_api_gateway_deployment" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
