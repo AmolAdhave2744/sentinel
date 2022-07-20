@@ -13,8 +13,8 @@ all_waf = filter tfplan.resource_changes as _, rc {
 violatingAccessLogs = 0
 for all_waf as _, waf{
 	if "log_destination_configs" in keys(waf["change"]["after_unknown"]){
-	print(waf["change"]["after_unknown"]["log_destination_configs"][0]["enabled"])
-        if waf["change"]["after_unknown"]["log_destination_configs"][0]["enabled"] == false {
+	print(waf["change"]["after_unknown"]["log_destination_configs"]["enabled"])
+        if waf["change"]["after_unknown"]["log_destination_configs"]["enabled"] == true {
 	        print("Violation: WAF can not be launched with logs:-", waf["address"])
             violatingAccessLogs = violatingAccessLogs + 1 
             }
