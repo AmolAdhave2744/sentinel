@@ -1,25 +1,30 @@
-import "tfplan/v2" as tfplan
-import "tfstate/v2" as tfstate
+#import "tfplan/v2" as tfplan
+#import "tfstate/v2" as tfstate
 
 #param network_account_ID default "123456789"
 #network_account_ID = "123456789"
-all_waf = filter tfplan.resource_changes as _, rc {
-    rc.type is "aws_wafv2_web_acl_logging_configuration" and
-    rc.mode is "managed" and
-    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-    rc.change.actions contains "read" or rc.change.actions contains "no-op")
-}
+#all_waf = filter tfplan.resource_changes as _, rc {
+#    rc.type is "aws_wafv2_web_acl_logging_configuration" and
+#    rc.mode is "managed" and
+#    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+#    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+#}
+#list all waf copy filter code here for waf
+#all_logging_enabled = []
+#violatingAccessLogs = 0
+#for all_waf as _, waf{
+#	if "log_destination_configs" in keys(waf["change"]["after_unknown"]){
+#	    print(waf["change"]["after_unknown"]["log_destination_configs"])
+#        if waf["change"]["after_unknown"]["log_destination_configs"] == "true" {
+#	        print("Violation: WAF can not be launched with logs:-", waf["address"])
+#            all_logging_enabled list ahe ti append kar waf["address"]
+#            }
+#} 
+#}
+#for loop on list of all the waf and get a list of all waf
+#you will have two list - 1. all waf 2. Logging configuration
 
-violatingAccessLogs = 0
-for all_waf as _, waf{
-	if "log_destination_configs" in keys(waf["change"]["after_unknown"]){
-	    print(waf["change"]["after_unknown"]["log_destination_configs"])
-        if waf["change"]["after_unknown"]["log_destination_configs"] == "true" {
-	        print("Violation: WAF can not be launched with logs:-", waf["address"])
-            violatingAccessLogs = violatingAccessLogs + 1 
-            }
-} 
-}
-main = rule {
-   violatingAccessLogs is 0
-}
+#create a for loop and check for not common waf name in both the list if name is not present policy will failed
+#main = rule {
+ #  violatingAccessLogs is 0
+#}
