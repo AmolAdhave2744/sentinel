@@ -18,9 +18,7 @@ for all_waf as _, waf{
 	        print("Violation: WAF can not be launched with logs:-", waf["address"])
             violatingAccessLogs = violatingAccessLogs + 1 
             }
-} else {
-	Print("WAF has not logs associated - ", waf["address"])
-	}
+} 
 }
 main = rule {
    violatingAccessLogs is 0
