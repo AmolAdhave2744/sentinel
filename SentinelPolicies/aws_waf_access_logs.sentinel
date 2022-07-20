@@ -10,11 +10,18 @@ all_waf = filter tfplan.resource_changes as _, rc {
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
 
-validate_condition = 0
+violatingAccessLogs = 0
 for all_waf as _, waf{
-    print(waf) 
+	if "log_destination_configs" in keys(waf["change"]["after_unknown"]){
+	print(waf["change"]["after_unknown"]["log_destination_configs"][0]["enabled"])
+        if waf["change"]["after_unknown"]["log_destination_configs"][0]["enabled"] == false {
+	        print("Violation: WAF can not be launched with logs:-", waf["address"])
+            violatingAccessLogs = violatingAccessLogs + 1 
+            }
+} else {
+	Print("WAF has not logs associated - ", waf["address"])
+	}
 }
-
 main = rule {
-    validate_condition <= 0 
+   violatingAccessLogs is 0
 }
