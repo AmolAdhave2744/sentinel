@@ -9,7 +9,7 @@ all_api = filter tfplan.resource_changes as _, rc {
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
-
+/*
 validate_condition = 0
 
 for all_api as _, api {
@@ -21,5 +21,15 @@ for all_api as _, api {
         print("Violation: WAF is not assciated with One or API Gateway")
     }}
 main = rule{
+    validate_condition <= 0 
+}
+*/
+
+validate_condition = 0
+for all_api as _, api{
+    print(api) 
+}
+
+main = rule {
     validate_condition <= 0 
 }
