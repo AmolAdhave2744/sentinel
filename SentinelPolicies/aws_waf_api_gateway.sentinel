@@ -11,10 +11,15 @@ all_api = filter tfplan.resource_changes as _, rc {
 }
 
 validate_condition = 0
-for all_api as _, api{
-    print(api) 
-}
 
-main = rule {
+for all_api as _, api {
+    if "id" not in keys(api["change"]["after_unknown"]) {
+        validate_condition = validate_condition + 1
+        print("Violation: id not found for - ", api["address"])
+    } else if api["change"]["after_unknown"]["id"] is not true {
+        validate_condition = validate_condition + 1
+        print("Violation: WAF is not assciated with One or API Gateway")
+    }}
+main = rule{
     validate_condition <= 0 
 }
