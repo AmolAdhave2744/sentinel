@@ -1,0 +1,23 @@
+import "tfplan/v2" as tfplan
+import "tfstate/v2" as tfstate
+
+all_lb = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_alb" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+
+
+all_waf_asso = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_wafregional_web_acl_association" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
+ for all_waf_asso as _, waf {
+    print("waf - ", waf)
+ }
+ for all_lb as _, lb{
+    print("lb -", lb)
+ }
