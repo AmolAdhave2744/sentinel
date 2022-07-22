@@ -8,17 +8,27 @@ all_lb = filter tfplan.resource_changes as _, rc {
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
-
+waf_associated_resources = []
+all_alb_addresses = []
 validate_condition = 0
 all_waf_asso = filter tfconfig.resources as _, rc {
     rc.type is "aws_wafregional_web_acl_association"
 }
  for all_waf_asso as _, waf {
-    print("waf - ", waf)
+    if length(waf["config"]["resource_arn"]["references"]) != 0{
+        print(waf["config"]["resource_arn"]["references"][1])
+        append(waf_associated_resources, waf["config"]["resource_arn"]["references"][1])
+    }
  }
  for all_lb as _, lb{
-    print("lb -", lb)
+    append(all_alb_addresses, lb["address"])
  }
+for all_alb_addresses as _, alb{
+    if alb not in waf_associated_resources{
+        print("Violation: WAF association not implemented for ALB:", alb)
+        validate_condition = validate_condition + 1
+    }
+}
  main = rule {
     validate_condition <= 0 
 }
