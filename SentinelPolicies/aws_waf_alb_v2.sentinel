@@ -8,7 +8,7 @@ all_lb = filter tfplan.resource_changes as _, rc {
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
 
-
+validate_condition = 0
 all_waf_asso = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_wafregional_web_acl_association" and
     rc.mode is "managed" and
@@ -21,3 +21,6 @@ all_waf_asso = filter tfplan.resource_changes as _, rc {
  for all_lb as _, lb{
     print("lb -", lb)
  }
+ main = rule {
+    validate_condition <= 0 
+}
