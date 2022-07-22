@@ -11,7 +11,7 @@ all_lb = filter tfplan.resource_changes as _, rc {
 
 validate_condition = 0
 all_waf_asso = filter tfconfig.resources as _, rc {
-    rc.type is "aws_wafv2_web_acl_logging_configuration"
+    rc.type is "aws_wafregional_web_acl_association"
 }
  for all_waf_asso as _, waf {
     print("waf - ", waf)
