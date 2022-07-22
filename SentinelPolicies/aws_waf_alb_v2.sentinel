@@ -30,7 +30,7 @@ all_waf_asso = filter tfconfig.resources as _, rc {
  for all_lb as _, lb{
     append(all_alb_addresses, lb["address"])
  }
- for all_api as_, api{
+ for all_api as _, api{
     append(all_api_addresses, api["address"])
  }
 for all_alb_addresses as _, alb{
