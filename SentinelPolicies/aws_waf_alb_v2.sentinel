@@ -56,7 +56,7 @@ for all_api_addresses as _, api{
     }
 }
 for all_waf_addresses as _, waf{
-    if api not in waf_associated_resources{
+    if waf not in waf_associated_resources{
         print("Violation: WAF association not implemented for WAF:", waf)
         validate_condition = validate_condition + 1
     }
