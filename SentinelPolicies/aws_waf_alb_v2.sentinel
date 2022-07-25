@@ -14,9 +14,16 @@ all_api = filter tfplan.resource_changes as _, rc {
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
+all_waf = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_wafregional_web_acl" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+}
 waf_associated_resources = []
 all_alb_addresses = []
 all_api_addresses = []
+all_waf_addresses = []
 validate_condition = 0
 all_waf_asso = filter tfconfig.resources as _, rc {
     rc.type is "aws_wafregional_web_acl_association"
@@ -33,6 +40,9 @@ all_waf_asso = filter tfconfig.resources as _, rc {
  for all_api as _, api{
     append(all_api_addresses, api["address"])
  }
+  for all_waf as _, waf{
+    append(all_waf_addresses, waf["address"])
+ }
 for all_alb_addresses as _, alb{
     if alb not in waf_associated_resources{
         print("Violation: WAF association not implemented for ALB:", alb)
@@ -42,6 +52,12 @@ for all_alb_addresses as _, alb{
 for all_api_addresses as _, api{
     if api not in waf_associated_resources{
         print("Violation: WAF association not implemented for API:", api)
+        validate_condition = validate_condition + 1
+    }
+}
+for all_waf_addresses as _, waf{
+    if api not in waf_associated_resources{
+        print("Violation: WAF association not implemented for WAF:", waf)
         validate_condition = validate_condition + 1
     }
 }

@@ -1,6 +1,6 @@
-#import "tfplan/v2" as tfplan
+import "tfplan/v2" as tfplan
 #import "tfstate/v2" as tfstate
-/*
+
 #param network_account_ID default "123456789"
 #network_account_ID = "123456789"
 all_lb = filter tfplan.resource_changes as _, rc {
@@ -23,5 +23,3 @@ for all_lb as _, lb{
 main = rule {
     validate_condition <= 0 
 }
-*/
-

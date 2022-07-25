@@ -1,5 +1,6 @@
 import "tfplan/v2" as tfplan
 import "tfstate/v2" as tfstate
+import "tfconfig/v2" as tfconfig
 
 param network_account_ID default "123456789"
 network_account_ID = "123456789"
@@ -9,22 +10,23 @@ all_waf = filter tfplan.resource_changes as _, rc {
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
-all_log = filter tfplan.resource_changes as _, rc {
-    rc.type is "aws_wafregional_web_acl_association" and
-    rc.mode is "managed" and
-    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-    rc.change.actions contains "read" or rc.change.actions contains "no-op")
+all_waf_asso = filter tfconfig.resources as _, rc {
+    rc.type is "aws_wafregional_web_acl_association"
 }
+
 // list all waf copy filter code here for waf
 all_logging_enabled = []
 all_waf = []
 violatingAccessLogs = 0
 for all_waf as _, waf{
 	waf["address"]
-}
-for all_log as _, log{
-    print(log)
-}
+} 
+for all_waf_asso as _, waf {
+    if length(waf["config"]["resource_arn"]["references"]) != 0{
+        print(waf["config"]["resource_arn"]["references"][1])
+        append(waf_associated_resources, waf["config"]["resource_arn"]["references"][1])
+    }
+ }
 // for loop on list of all the waf and get a list of all waf
 // you will have two list - 1. all waf 2. Logging configuration
 
