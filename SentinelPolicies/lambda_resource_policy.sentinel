@@ -11,7 +11,7 @@ alllambda = filter tfplan.resource_changes as _, rc {
     rc.change.actions contains "read" or rc.change.actions contains "no-op")
 }
 validate_condition = 0
-for alllambda _, lambda{
+for alllambda as _, lambda{
     print(lambda) 
 }
 
