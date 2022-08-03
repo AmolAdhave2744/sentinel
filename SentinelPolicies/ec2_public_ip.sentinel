@@ -68,7 +68,7 @@ eip = filter tfplan.resource_changes as _, rc {
      rc.change.after.allocation_id else null is not null )
 }
 print("eip",eip)
-Count violations
+# Count violations
 ec2_public_ip_violations=0
 
 # if(int(current_aws_id)  not in  aws_allowed_account_id ){
