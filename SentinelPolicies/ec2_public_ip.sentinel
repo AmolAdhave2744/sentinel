@@ -1,4 +1,4 @@
-/*
+
 ###########################################################
 #Rule: Internet Gateway Allowed to specific AWS Account Id
 ###########################################################
@@ -17,11 +17,10 @@ ec2All = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_instance" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-     rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-    (rc.change.after.associate_public_ip_address else null is not null or
-     rc.change.after.associate_public_ip_address is true )
+     rc.change.actions contains "read" or rc.change.actions contains "no-op")  
 }
- aws_instance = filter tfplan.resource_changes as _, rc {
+# Get all aws_instance with Public IP
+ ec2_public_ip_list = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_instance" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
@@ -30,41 +29,38 @@ ec2All = filter tfplan.resource_changes as _, rc {
      rc.change.after.associate_public_ip_address is true )
 }
 print("ec2All-full",ec2All)
-print("aws_instance",aws_instance)
+print("ec2_public_ip_list",ec2_public_ip_list)
  # Get all aws_instance with Public IP
 eipFull = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_eip_association" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-     rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-    (rc.change.after.instance_id else null is not null and 
-     rc.change.after.allocation_id else null is not null )
-}
- # Get all aws_instance with Public IP
-eip = filter tfplan.resource_changes as _, rc {
-    rc.type is "aws_eip_association" and
-    rc.mode is "managed" and
-    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-     rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-    (rc.change.after.instance_id else null is not null and 
-     rc.change.after.allocation_id else null is not null )
+     rc.change.actions contains "read" or rc.change.actions contains "no-op") 
 }
 print("eip-full",eipFull)
-print("eip",eip)
+ # Get all aws_instance with Public IP
+# eip = filter tfplan.resource_changes as _, rc {
+#     rc.type is "aws_eip_association" and
+#     rc.mode is "managed" and
+#     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+#      rc.change.actions contains "read" or rc.change.actions contains "no-op") and
+#     (rc.change.after.instance_id else null is not null and 
+#      rc.change.after.allocation_id else null is not null )
+# }
+# print("eip",eip)
 # Count violations
 ec2_public_ip_violations=0
 
-if(int(current_aws_id)  not in  aws_allowed_account_id ){
-    if (length(aws_instance) > 0 ) {
-        ec2_public_ip_violations +=1
-        print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Public IP")
-    }
-    if  (length(eip) > 0 ) {
-        ec2_public_ip_violations +=1
-        print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Elastic IP (Public IP)")
-    }
-}
+# if(int(current_aws_id)  not in  aws_allowed_account_id ){
+#     if (length(ec2_public_ip_list) > 0 ) {
+#         ec2_public_ip_violations +=1
+#         print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Public IP")
+#     }
+#     if  (length(eip) > 0 ) {
+#         ec2_public_ip_violations +=1
+#         print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Elastic IP (Public IP)")
+#     }
+# }
 main = rule {
     ec2_public_ip_violations <= 0 
 }
-*/
