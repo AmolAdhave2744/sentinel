@@ -1,7 +1,7 @@
 module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
-policy "lambda_resource_policy" {
+policy "ec2_public_ip" {
    enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/lambda_resource_policy.sentinel"
+   source = "./SentinelPolicies/ec2_public_ip.sentinel"
 }
