@@ -59,16 +59,16 @@ eipFull = filter tfplan.resource_changes as _, rc {
 }
 print("eip-full",eipFull)
  # Get all aws_instance with Public IP
-# eip = filter tfplan.resource_changes as _, rc {
-#     rc.type is "aws_eip_association" and
-#     rc.mode is "managed" and
-#     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-#      rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-#     (rc.change.after.instance_id else null is not null and 
-#      rc.change.after.allocation_id else null is not null )
-# }
-# print("eip",eip)
-# Count violations
+eip = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_eip_association" and
+    rc.mode is "managed" and
+    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
+     rc.change.actions contains "read" or rc.change.actions contains "no-op") and
+    (rc.change.after.instance_id else null is not null and 
+     rc.change.after.allocation_id else null is not null )
+}
+print("eip",eip)
+Count violations
 ec2_public_ip_violations=0
 
 # if(int(current_aws_id)  not in  aws_allowed_account_id ){
