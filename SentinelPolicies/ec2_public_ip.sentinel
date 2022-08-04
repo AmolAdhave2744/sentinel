@@ -7,6 +7,7 @@
 ###########################################################
 import "tfplan/v2" as tfplan 
 import "tfstate/v2" as tfstate
+import "tfconfig/v2" as tfconfig
 
 param aws_allowed_account_id default []  # [995566778899, 3064333]
 # get current account id from Data source
@@ -45,6 +46,7 @@ eipFull = filter tfplan.resource_changes as _, rc {
      rc.change.actions contains "read" or rc.change.actions contains "no-op") 
 }
 print("eip-full",eipFull)
+
 for eipFull as _, eip {
       print("eip" ,eip )
     if "instance_id" in keys(eip["change"]["after"])    {
@@ -55,6 +57,14 @@ for eipFull as _, eip {
     }
 }
 
+aws_instance = filter tfconfig.resources as _, rc {
+    rc.type is "aws_instance"
+}
+print("Full-aws_instance",aws_instance)
+aws_eip_association = filter tfconfig.resources as _, rc {
+    rc.type is "aws_eip_association"
+}
+print("full-aws_eip_association",aws_eip_association)
 # Count violations
 ec2_public_ip_violations=0
 
