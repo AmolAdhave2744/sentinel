@@ -46,6 +46,7 @@ eipFull = filter tfplan.resource_changes as _, rc {
 }
 print("eip-full",eipFull)
 for eipFull as _, eip {
+      print("eip" ,eip )
     if "instance_id" in keys(eip["change"]["after"])    {
         print(eip["change"]["after"]["instance_id"])         
     }
