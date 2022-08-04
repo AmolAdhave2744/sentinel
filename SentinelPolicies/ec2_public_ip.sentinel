@@ -26,45 +26,34 @@ ec2All = filter tfplan.resource_changes as _, rc {
     rc.mode is "managed" and
     (rc.change.actions contains "create" or   rc.change.actions contains "update" or
      rc.change.actions contains "read" or rc.change.actions contains "no-op") and
-    ((rc.change.after.associate_public_ip_address else null is not null and
-     rc.change.after.associate_public_ip_address is true ) )
-    #  or (rc.change.after_unknown.associate_public_ip_address else null is not null or
-    #  rc.change.after_unknown.associate_public_ip_address is true )
-    #  )
-}
+     (rc.change.after.associate_public_ip_address else null is not null and
+     rc.change.after.associate_public_ip_address is true ) 
 
 print("ec2All-full",ec2All)
-print("ec2_public_ip_list",ec2_public_ip_list) 
+print(length(ec2_public_ip_list)," -- ec2_public_ip_list -- ",ec2_public_ip_list) 
 
 
 
- # Get all aws_instance with Public IP
-eipFull = filter tfplan.resource_changes as _, rc {
-    rc.type is "aws_eip_association" and
-    rc.mode is "managed" and
-    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-     rc.change.actions contains "read" or rc.change.actions contains "no-op") 
-}
-print("eip-full",eipFull)
-
-for eipFull as _, eip {
-      print("eip" ,eip )
-    if "instance_id" in keys(eip["change"]["after"])    {
-        print(eip["change"]["after"]["instance_id"])         
-    }
-     if "allocation_id" in keys(eip["change"]["after"]) {
-        print(eip["change"]["after"]["allocation_id"])         
-    }
-}
 
 aws_instance = filter tfconfig.resources as _, rc {
     rc.type is "aws_instance"
 }
 print("Full-aws_instance",aws_instance)
+
+#-------------------------------
 aws_eip_association = filter tfconfig.resources as _, rc {
     rc.type is "aws_eip_association"
 }
 print("full-aws_eip_association",aws_eip_association)
+aws_eip_public_ip = filter tfconfig.resources as _, rc {
+    rc.type is "aws_eip_association" and
+    rc.mode is "managed" and
+    (rc.config.allocation_id else null is not null and 
+    rc.config.instance_id else null is not null )
+}
+
+print("full-aws_eip_public_ip",aws_eip_public_ip)
+print("length-aws_eip_public_ip",length(aws_eip_public_ip))
 # Count violations
 ec2_public_ip_violations=0
 
