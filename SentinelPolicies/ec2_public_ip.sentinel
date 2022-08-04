@@ -28,7 +28,7 @@ ec2All = filter tfplan.resource_changes as _, rc {
      rc.change.actions contains "read" or rc.change.actions contains "no-op") and
      (rc.change.after.associate_public_ip_address else null is not null and
      rc.change.after.associate_public_ip_address is true ) 
-
+ }
 print("ec2All-full",ec2All)
 print(length(ec2_public_ip_list)," -- ec2_public_ip_list -- ",ec2_public_ip_list) 
 
