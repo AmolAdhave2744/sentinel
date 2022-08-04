@@ -9,17 +9,10 @@ import "tfplan/v2" as tfplan
 import "tfstate/v2" as tfstate
 import "tfconfig/v2" as tfconfig
 
-param aws_allowed_account_id default []  # [995566778899, 3064333]
+param aws_allowed_account_id default []  # [955766821354, 3064333]
 # get current account id from Data source
 current_aws_id=tfstate.outputs.account_id.value 
 
-# Get all aws_instance with Public IP
-ec2All = filter tfplan.resource_changes as _, rc {
-    rc.type is "aws_instance" and
-    rc.mode is "managed" and
-    (rc.change.actions contains "create" or   rc.change.actions contains "update" or
-     rc.change.actions contains "read" or rc.change.actions contains "no-op")  
-}
 # Get all aws_instance with Public IP
  ec2_public_ip_list = filter tfplan.resource_changes as _, rc {
     rc.type is "aws_instance" and
@@ -28,45 +21,27 @@ ec2All = filter tfplan.resource_changes as _, rc {
      rc.change.actions contains "read" or rc.change.actions contains "no-op") and
      (rc.change.after.associate_public_ip_address else null is not null and
      rc.change.after.associate_public_ip_address is true ) 
- }
-print("ec2All-full",ec2All)
-print(length(ec2_public_ip_list)," -- ec2_public_ip_list -- ",ec2_public_ip_list) 
-
-
-
-
-aws_instance = filter tfconfig.resources as _, rc {
-    rc.type is "aws_instance"
-}
-print("Full-aws_instance",aws_instance)
-
-#-------------------------------
-aws_eip_association = filter tfconfig.resources as _, rc {
-    rc.type is "aws_eip_association"
-}
-print("full-aws_eip_association",aws_eip_association)
+ } 
+# Get all aws eip association  
 aws_eip_public_ip = filter tfconfig.resources as _, rc {
     rc.type is "aws_eip_association" and
     rc.mode is "managed" and
     (rc.config.allocation_id else null is not null and 
     rc.config.instance_id else null is not null )
 }
-
-print("full-aws_eip_public_ip",aws_eip_public_ip)
-print("length-aws_eip_public_ip",length(aws_eip_public_ip))
 # Count violations
 ec2_public_ip_violations=0
 
-# if(int(current_aws_id)  not in  aws_allowed_account_id ){
-#     if (length(ec2_public_ip_list) > 0 ) {
-#         ec2_public_ip_violations +=1
-#         print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Public IP")
-#     }
-#     if  (length(eip) > 0 ) {
-#         ec2_public_ip_violations +=1
-#         print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Elastic IP (Public IP)")
-#     }
-# }
+if(int(current_aws_id)  not in  aws_allowed_account_id ){
+    if (length(ec2_public_ip_list) > 0 ) {
+        ec2_public_ip_violations +=1
+        print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Public IP")
+    }
+    if  (length(aws_eip_public_ip) > 0 ) {
+        ec2_public_ip_violations +=1
+        print("Violation: Account Id - ", current_aws_id ," not allowed to create Ec2 Instance with Elastic IP (Public IP)")
+    }
+}
 main = rule {
     ec2_public_ip_violations <= 0 
 }
