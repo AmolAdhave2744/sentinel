@@ -10,16 +10,21 @@ print("aws_s3_bucket",s3_list)
 s3_sse_config_list = plan.find_resources("aws_s3_bucket_server_side_encryption_configuration") 
 
 print("s3_sse_config_list",s3_sse_config_list)
-s3_sse_config_list = filter tfconfig.resources as _, rc {
-    rc.type is "aws_s3_bucket_server_side_encryption_configuration"
+
+s3_bucket_name_list = []
+for  s3_list as _, s3{
+    print("s3",s3)
+    append(s3_bucket_name_list, s3.change.after.bucket)
 }
+print("s3_bucket_name_list",s3_bucket_name_list)
 
-print("s3_sse_config_list",s3_sse_config_list)
 
-#  for  s3_list as _, s3{
-#     append(s3_bucket_name_list, s3["bucket"])
-#  }
-
+sse_bucket_name_list = []
+for  s3_sse_config_list as _, sse{
+    print("sse",sse)
+    append(sse_bucket_name_list, sse.change.after.bucket)
+}
+print("sse_bucket_name_list",sse_bucket_name_list)
  
 violatings3Acl = 0 
 
