@@ -1,7 +1,7 @@
 module "tfplan-functions" {
     source = "./SentinelPolicies/tfplan-functions.sentinel"
 }
-policy "ec2_public_ip" {
+policy "s3-bucket-server-side-encryption-enabled" {
    enforcement_level = "hard-mandatory"
-   source = "./SentinelPolicies/ec2_public_ip.sentinel"
+   source = "./SentinelPolicies/s3-bucket-server-side-encryption-enabled.sentinel"
 }

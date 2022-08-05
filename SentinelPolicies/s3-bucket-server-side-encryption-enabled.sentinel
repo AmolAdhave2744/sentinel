@@ -1,0 +1,28 @@
+import "tfplan-functions" as plan
+import "tfconfig/v2" as tfconfig
+
+# Get all aws_s3_bucket_acl
+s3_list = plan.find_resources("aws_s3_bucket") 
+
+print("aws_s3_bucket",s3_list)
+
+# Get all aws_s3_bucket_acl
+s3_sse_config_list = plan.find_resources("aws_s3_bucket_server_side_encryption_configuration") 
+
+print("s3_sse_config_list",s3_sse_config_list)
+s3_sse_config_list = filter tfconfig.resources as _, rc {
+    rc.type is "aws_s3_bucket_server_side_encryption_configuration"
+}
+
+print("s3_sse_config_list",s3_sse_config_list)
+
+#  for  s3_list as _, s3{
+#     append(s3_bucket_name_list, s3["bucket"])
+#  }
+
+ 
+violatings3Acl = 0 
+
+main = rule {
+    violatings3Acl <= 0 
+}
