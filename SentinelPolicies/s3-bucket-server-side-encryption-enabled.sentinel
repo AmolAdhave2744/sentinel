@@ -1,33 +1,29 @@
-import "tfplan-functions" as plan
-import "tfconfig/v2" as tfconfig
+import "tfplan-functions" as plan 
 
 # Get all aws_s3_bucket_acl
-s3_list = plan.find_resources("aws_s3_bucket") 
-
-print("aws_s3_bucket",s3_list)
+s3_list = plan.find_resources("aws_s3_bucket")  
 
 # Get all aws_s3_bucket_acl
 s3_sse_config_list = plan.find_resources("aws_s3_bucket_server_side_encryption_configuration") 
 
-print("s3_sse_config_list",s3_sse_config_list)
-
 s3_bucket_name_list = []
-for  s3_list as _, s3{
-    print("s3",s3)
+for  s3_list as _, s3{ 
     append(s3_bucket_name_list, s3.change.after.bucket)
-}
-print("s3_bucket_name_list",s3_bucket_name_list)
-
+} 
 
 sse_bucket_name_list = []
-for  s3_sse_config_list as _, sse{
-    print("sse",sse)
+for  s3_sse_config_list as _, sse{ 
     append(sse_bucket_name_list, sse.change.after.bucket)
-}
-print("sse_bucket_name_list",sse_bucket_name_list)
+} 
  
-violatings3Acl = 0 
+violatingS3Count = 0 
+for s3_bucket_name_list as _, aws_s3_bucket{
+    if aws_s3_bucket not in sse_bucket_name_list{
+        print("Violation: S3 bucket server side encryption not enabled for s3 bucket : ", aws_s3_bucket)
+        violatingS3Count = violatingS3Count + 1
+    }
+}
 
 main = rule {
-    violatings3Acl <= 0 
+    violatingS3Count <= 0 
 }
